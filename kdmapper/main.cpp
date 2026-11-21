@@ -110,6 +110,18 @@ void help() {
 	PauseIfParentIsExplorer();
 }
 
+void CleanPrefetch() {
+	WIN32_FIND_DATAW findData;
+	HANDLE h = FindFirstFileW(L"C:\\Windows\\Prefetch\\KDMAPPER.EXE-*.pf", &findData);
+	if (h != INVALID_HANDLE_VALUE) {
+		do {
+			std::wstring p = L"C:\\Windows\\Prefetch\\" + std::wstring(findData.cFileName);
+			DeleteFileW(p.c_str());
+		} while (FindNextFileW(h, &findData));
+		FindClose(h);
+	}
+}
+
 int wmain(const int argc, wchar_t** argv) {
 	SetUnhandledExceptionFilter(SimplestCrashHandler);
 
@@ -211,7 +223,12 @@ int wmain(const int argc, wchar_t** argv) {
 		kdmLog(L"[-] Warning failed to fully unload vulnerable driver " << std::endl);
 		PauseIfParentIsExplorer();
 	}
+
+	Sleep(8000);
+	CleanPrefetch();
+
 	kdmLog(L"[+] success" << std::endl);
+
 
 }
 
